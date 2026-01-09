@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacist Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <header>
+        <div class="navbar">
+            <h1>Pharmacist Dashboard</h1>
+            <div class="nav-links">
+                <span>Welcome, {{ session['username'] }}</span>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="card" style="text-align: center;">
+            <h2>Search Prescription</h2>
+            <form action="{{ url_for('pharmacist_dashboard') }}" method="GET" style="max-width: 500px; margin: 0 auto;">
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <input type="number" name="prescription_id" placeholder="Enter Prescription ID" required
+                        value="{{ request.args.get('prescription_id', '') }}">
+                    <button type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+
+        {% if prescription %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between;">
+                <h2>Prescription #{{ prescription.prescription_id }} Details</h2>
+                <h3 class="status-{{ prescription.status }}">Status: {{ prescription.status|upper }}</h3>
+            </div>
+            <p><strong>Patient:</strong> {{ prescription.patient_name }}</p>
+            <p><strong>Doctor:</strong> {{ prescription.doctor_name }}</p>
+            <p><strong>Date:</strong> {{ prescription.date }}</p>
+
+            <h3>Medicines</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Days/Qty</th>
+                        <th>Unit Price</th>
+                        <th>Stock Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in details %}
+                    <tr>
+                        <td>{{ item.medicine_name }}</td>
+                        <td>{{ item.dosage }}</td>
+                        <td>{{ item.days }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td class="{{ 'text-danger' if item.stock < item.days else 'text-success' }}">
+                            {{ item.stock }} Available
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; text-align: right;">
+                {% if prescription.status == 'pending' %}
+                <form action="{{ url_for('validate_prescription', p_id=prescription.prescription_id) }}" method="POST">
+                    <button type="submit" class="btn-success">Validate & Generate Bill</button>
+                </form>
+                {% elif prescription.status == 'validated' %}
+                <div class="bill-box">
+                    <h3>Bill Generated</h3>
+                    <h1>Total Amount: ₹{{ bill.total_amount if bill else '0.00' }}</h1>
+                    <p>Status: <span style="color:red">{{ bill.payment_status }}</span></p>
+                    {% if bill %}
+                    <a href="{{ url_for('pay_bill', bill_id=bill.bill_id) }}"><button>Mark as Paid</button></a>
+                    {% endif %}
+                </div>
+                {% elif prescription.status == 'dispensed' %}
+                <div class="bill-box" style="background-color: #d4edda;">
+                    <h3>Dispensed & Paid</h3>
+                    <h1>Total Paid: ₹{{ bill.total_amount if bill else '0.00' }}</h1>
+                    <p>Transaction Complete</p>
+                    {% if bill %}
+                    <a href="{{ url_for('invoice', bill_id=bill.bill_id) }}" target="_blank"><button>View
+                            Invoice</button></a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% elif request.args.get('prescription_id') %}
+        <div class="card" style="text-align: center; color: red;">
+            <p>Prescription ID not found.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
