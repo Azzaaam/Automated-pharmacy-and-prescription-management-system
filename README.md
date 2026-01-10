@@ -54,10 +54,85 @@ The project focuses on **patient safety**, **efficiency**, and **clarity**, maki
 | Frontend    | HTML, CSS |
 | Backend     | Python (Flask) |
 | Database    | MySQL |
-| AI Models   | OpenAI (ChatGPT), Google Gemini |
+| AI Models   | OpenAI (ChatGPT) |
 | Authentication | Role-based (Admin, Doctor, Pharmacist) |
 
 ---
 
 ## 📁 Project Structure
+
+automated-pharmacy-system/
+│
+├── app.py
+├── .env
+├── .gitignore
+├── requirements.txt
+├── README.md
+│
+├── templates/
+│ ├── login.html
+│ ├── doctor_dashboard.html
+│ ├── pharmacist_dashboard.html
+│ ├── admin_dashboard.html
+│ ├── ai_analysis.html
+│ ├── invoice.html
+│ └── reports.html
+│
+├── static/
+│ ├── css/
+│ ├── uploads/
+│
+└── database/
+└── pharmacy_db.sql
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/automated-pharmacy-system.git
+cd automated-pharmacy-system
+
+2️⃣ Create Virtual Environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+3️⃣ Install Dependencies
+pip install -r requirements.txt
+
+4️⃣ Configure Environment Variables
+SECRET_KEY=hackathon_secret_key
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=pharmacy_db
+OPENAI_API_KEY=your_openai_api_key
+GEMINI_API_KEY=your_gemini_api_key
+
+5️⃣ Setup Database
+Import pharmacy_db.sql into MySQL using phpMyAdmin or MySQL CLI
+
+6️⃣ Run the Application
+python app.py
+
+Open in browser:
+http://127.0.0.1:5000
+
+| Role       | Username | Password |
+| ---------- | -------- | -------- |
+| Admin      | admin    | pass123  |
+| Doctor     | doc1     | pass123  |
+| Pharmacist | pharm1   | pass123  |
+
+🧠 AI Architecture (High-Level)
+
+Prescription Data / Image
+        ↓
+Text Extraction (OCR / DB)
+        ↓
+AI Engine (OpenAI / Gemini)
+        ↓
+Human-Readable Explanation
+
 
